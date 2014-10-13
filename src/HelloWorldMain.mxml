@@ -55,9 +55,7 @@
             this.addEventListener(NavigationEvent.GOTO_SCREEN, _onGotoScreen);
             this.addEventListener(VenueDataEvent.GET_VENUES, _onGetVenues);
 
-            // TODO: Set navigation back to REGISTER after completing the week 5 assignment
-            //dispatchEvent( new NavigationEvent( NavigationEvent.GOTO_SCREEN, ApplicationScreens.REGISTER ) );
-            dispatchEvent(new NavigationEvent(NavigationEvent.GOTO_SCREEN, ApplicationScreens.LOCATION_FEED_LIST));
+            dispatchEvent( new NavigationEvent( NavigationEvent.GOTO_SCREEN, ApplicationScreens.REGISTER ) );
         }
 
         private function _onGotoScreen(event:NavigationEvent):void {
