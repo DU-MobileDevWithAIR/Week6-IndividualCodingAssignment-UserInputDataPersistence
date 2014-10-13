@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!--
+  Created by scotty on 9/21/14.
+-->
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark"
+    creationComplete="_onCreationComplete( event )">
+
+    <fx:Script>
+        <![CDATA[
+            import edu.du.mobile.model.AppModel;
+
+            import mx.events.FlexEvent;
+
+            import mx.utils.ObjectUtil;
+
+            [Bindable] private var _appModel:AppModel = AppModel.getInstance();
+            [Bindable] private var _venue:Object;
+
+            private function _onCreationComplete( event:FlexEvent ):void
+            {
+                trace( ObjectUtil.toString( _appModel.selectedLocation ) );
+
+                _venue = _appModel.selectedLocation;
+            }
+        ]]>
+    </fx:Script>
+
+    <s:Scroller top="20" left="20" right="20"
+        height="100%">
+
+        <s:VGroup >
+
+            <s:Label text="{ _venue.name }"
+                     width="80%"/>
+
+            <s:HGroup>
+                <s:Label text="Map"
+                   color="blue"
+                   paddingLeft="25"/>
+
+                <s:Label text="Share"
+                   color="blue"
+                   paddingLeft="70"/>
+            </s:HGroup>
+
+            <s:Image id="locationImage"
+               height="300"
+               width="100%"
+               backgroundColor="#000000"/>
+
+
+
+            <s:Label text="Phone"
+               color="blue"/>
+            <s:Label text="{ _venue.contact.formattedPhone }"/>
+
+            <s:Label text="Website"
+               color="blue"/>
+            <s:Label text="N/A"/>
+
+            <s:Label text="Address"
+               color="blue"/>
+            <s:Label text="{ _venue.location.formattedAddress[0] }"/>
+            <s:Label text="{  _venue.location.formattedAddress[1] }"/>
+
+            <s:HGroup width="100%">
+                <s:Label text="Directions to Here"
+                    color="blue"/>
+                <s:Spacer width="100%"/>
+                <s:Label text="Directions from Here"
+                    color="blue"/>
+            </s:HGroup>
+
+        </s:VGroup>
+
+    </s:Scroller>
+</s:View>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+  Created by jun on 9/21/14.
+
+  Derived from: http://help.adobe.com/en_US/flex/using/WS67cd75b2532ad652-1abb110512d5bda966d-8000.html
+-->
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark">
+
+    <fx:Script>
+        <![CDATA[
+
+            [Bindable] public var title:String = "Hello World Popup";
+            [Bindable] public var message:String = "Popup Message";
+            [Bindable] public var buttonLabel:String = "OK";
+
+        ]]>
+    </fx:Script>
+
+    <s:Panel title="{ title }">
+
+        <s:VGroup width="100%"
+            horizontalAlign="center"
+            paddingTop="20" gap="20">
+
+            <s:Label text="{ message }"/>
+
+            <s:Button label="{ buttonLabel }"
+                click="close();"/>
+
+        </s:VGroup>
+
+    </s:Panel>
+
+</s:SkinnablePopUpContainer>

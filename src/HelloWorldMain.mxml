@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!--
+  Created by jun on 9/14/14.
+-->
+<s:ViewNavigatorApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark"
+    title="Hello World!"
+    applicationDPI="320"
+    applicationComplete="_onApplicationComplete( event )">
+
+    <fx:Script>
+        <![CDATA[
+        import edu.du.mobile.control.events.VenueDataEvent;
+        import edu.du.mobile.control.events.NavigationEvent;
+        import edu.du.mobile.model.AppModel;
+        import edu.du.mobile.model.constants.ApplicationScreens;
+        import edu.du.mobile.view.LocationDetailsView;
+        import edu.du.mobile.view.LocationFeedListView;
+        import edu.du.mobile.view.LoginOrRegisterView;
+
+        import mx.events.FlexEvent;
+        import mx.rpc.Fault;
+        import mx.rpc.events.FaultEvent;
+        import mx.rpc.events.ResultEvent;
+        import mx.utils.ObjectUtil;
+
+        // https://developer.foursquare.com/docs/venues/search
+        public static const FOURSQUARE_LOCATION_SERVICE_BASE_URL:String = "https://api.foursquare.com/v2/venues/search?";
+
+        [Bindable]
+        private var _appModel:AppModel = AppModel.getInstance();
+
+        [Bindable]
+        private var _searchVenueServiceURL:String;
+
+        // Client ID and Secret were from creating an app registration: https://foursquare.com/developers/apps
+        private var _clientID:String = "FJOBDXJYZAIVCCTHHPVU4NIB5S5C5CCAKOGVKX2VCOBAKZUB";
+        private var _clientSecret:String = "4VM52Z3OJSPCM1GZTEIWOEO0DP0BDCEOHV0T2BIMK5LCYDXP";
+
+        // This is the lat/long for RealEyes Media @ 940 Logan St., Denver, CO 80203
+        private var _latitude:String = "39.7311660";
+        private var _longitude:String = "-104.9819070";
+
+
+        private function _updateSearchVenueServiceURL( searchString:String="" ):void {
+            // Example: https://api.foursquare.com/v2/venues/search?ll=39.7311660,-104.9819070&client_id=FJOBDXJYZAIVCCTHHPVU4NIB5S5C5CCAKOGVKX2VCOBAKZUB&client_secret=4VM52Z3OJSPCM1GZTEIWOEO0DP0BDCEOHV0T2BIMK5LCYDXP&v=20140806
+            _searchVenueServiceURL = FOURSQUARE_LOCATION_SERVICE_BASE_URL
+                    + "ll=" + _latitude + "," + _longitude
+                    + "&client_id=" + _clientID
+                    + "&client_secret=" + _clientSecret
+                    + "&v=20140806";
+        }
+
+        private function _onApplicationComplete(event:FlexEvent):void {
+            this.addEventListener(NavigationEvent.GOTO_SCREEN, _onGotoScreen);
+            this.addEventListener(VenueDataEvent.GET_VENUES, _onGetVenues);
+
+            // TODO: Set navigation back to REGISTER after completing the week 5 assignment
+            //dispatchEvent( new NavigationEvent( NavigationEvent.GOTO_SCREEN, ApplicationScreens.REGISTER ) );
+            dispatchEvent(new NavigationEvent(NavigationEvent.GOTO_SCREEN, ApplicationScreens.LOCATION_FEED_LIST));
+        }
+
+        private function _onGotoScreen(event:NavigationEvent):void {
+            switch (event.screenName) {
+                case ApplicationScreens.LOCATION_FEED_LIST:
+                {
+                    navigator.pushView(LocationFeedListView);
+                    break;
+                }
+                case ApplicationScreens.LOCATION_DETAILS:
+                {
+                    navigator.pushView(LocationDetailsView);
+                    break;
+                }
+                case ApplicationScreens.LOGIN:
+                case ApplicationScreens.REGISTER:
+                {
+                    navigator.pushView(LoginOrRegisterView, event.screenName);
+                    break;
+                }
+                default:
+                {
+                }
+                    ;
+            }
+        }
+
+        private function _onGetVenues(event:VenueDataEvent):void {
+
+            _updateSearchVenueServiceURL();
+
+            searchVenueService.send();
+        }
+
+        private function _onSearchVenueServiceResult(event:ResultEvent):void {
+            trace(ObjectUtil.toString(event.result));
+
+            var venueData:Object = JSON.parse(event.result.toString());
+
+            trace(ObjectUtil.toString(venueData));
+            _appModel.locationCollection.source = venueData.response.venues;
+        }
+
+        private function _onSearchVenueServiceFault(event:FaultEvent):void {
+            trace("Error calling Foursquare Service");
+        }
+        ]]>
+    </fx:Script>
+
+    <fx:Declarations>
+        <s:HTTPService id="searchVenueService"
+            resultFormat="text"
+            url="{ _searchVenueServiceURL }"
+            result="_onSearchVenueServiceResult( event )"
+            fault="_onSearchVenueServiceFault( event )"
+            showBusyCursor="true" />
+    </fx:Declarations>
+
+</s:ViewNavigatorApplication>
