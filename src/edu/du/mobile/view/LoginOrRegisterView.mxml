@@ -37,6 +37,7 @@
                     messagingPopupMessage = "Please fill out username/email and password.";
                     _formValidatedSuccessfully = false;
                 }
+                // TODO: Change this else if to loop through the AppModel's userCollection to compare the username and password against users in the collection.
                 else if( username.toLowerCase() != "student" || password != "password" )
                 {
                     messagingPopupTitle = "Login Error";
@@ -127,6 +128,8 @@
             title="{ messagingPopupTitle }"
             message="{ messagingPopupMessage }"
             close="_onMessagingPopupClose( event )"/>
+
+        <!-- TODO: Add an EmailValidator and use it to validate the email field when the user registers: https://flex.apache.org/asdoc/mx/validators/EmailValidator.html -->
     </fx:Declarations>
 
 

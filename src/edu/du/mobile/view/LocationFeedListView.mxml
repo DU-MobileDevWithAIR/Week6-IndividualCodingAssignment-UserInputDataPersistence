@@ -24,7 +24,7 @@
 
         private function _onListChange(event:Event):void {
 
-            _appModel.selectedLocation = locationList.selectedItem;
+            _appModel.selectedVenue = locationList.selectedItem;
 
             dispatchEvent(new NavigationEvent(NavigationEvent.GOTO_SCREEN, ApplicationScreens.LOCATION_DETAILS));
         }
@@ -50,7 +50,7 @@
         width="100%"
         height="100%"
         allowMultipleSelection="false"
-        dataProvider="{ _appModel.locationCollection }"
+        dataProvider="{ _appModel.venuesCollection }"
         labelField="name"
         change="_onListChange( event )"/>
 

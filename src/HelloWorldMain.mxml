@@ -14,9 +14,12 @@
         import edu.du.mobile.control.events.NavigationEvent;
         import edu.du.mobile.model.AppModel;
         import edu.du.mobile.model.constants.ApplicationScreens;
+        import edu.du.mobile.model.vo.Venue;
         import edu.du.mobile.view.LocationDetailsView;
         import edu.du.mobile.view.LocationFeedListView;
         import edu.du.mobile.view.LoginOrRegisterView;
+
+        import mx.collections.ArrayCollection;
 
         import mx.events.FlexEvent;
         import mx.rpc.Fault;
@@ -42,7 +45,7 @@
         private var _longitude:String = "-104.9819070";
 
 
-        private function _updateSearchVenueServiceURL( searchString:String="" ):void {
+        private function _updateSearchVenueServiceURL(searchString:String = ""):void {
             // Example: https://api.foursquare.com/v2/venues/search?ll=39.7311660,-104.9819070&client_id=FJOBDXJYZAIVCCTHHPVU4NIB5S5C5CCAKOGVKX2VCOBAKZUB&client_secret=4VM52Z3OJSPCM1GZTEIWOEO0DP0BDCEOHV0T2BIMK5LCYDXP&v=20140806
             _searchVenueServiceURL = FOURSQUARE_LOCATION_SERVICE_BASE_URL
                     + "ll=" + _latitude + "," + _longitude
@@ -55,7 +58,11 @@
             this.addEventListener(NavigationEvent.GOTO_SCREEN, _onGotoScreen);
             this.addEventListener(VenueDataEvent.GET_VENUES, _onGetVenues);
 
-            dispatchEvent( new NavigationEvent( NavigationEvent.GOTO_SCREEN, ApplicationScreens.REGISTER ) );
+            dispatchEvent(new NavigationEvent(NavigationEvent.GOTO_SCREEN, ApplicationScreens.LOGIN));
+
+
+            // TODO: Only make this HTTPService call if the _appModel.userCollection has no users in it.
+            dummyUserService.send();
         }
 
         private function _onGotoScreen(event:NavigationEvent):void {
@@ -93,13 +100,29 @@
         private function _onSearchVenueServiceResult(event:ResultEvent):void {
             trace(ObjectUtil.toString(event.result));
 
+            var venuesCollection:ArrayCollection = _appModel.venuesCollection;
             var venueData:Object = JSON.parse(event.result.toString());
 
-            trace(ObjectUtil.toString(venueData));
-            _appModel.locationCollection.source = venueData.response.venues;
+            for each( var venueData:Object in venueData.response.venues )
+            {
+                trace( venueData.name );
+                var venue:Venue = new Venue();
+                    venue.name = venueData.name;
+                    venue.contactPhone = venueData.contact.formattedPhone;
+                    venue.addressLine1 = venueData.location.formattedAddress[0];
+                    venue.addressLine2 = venueData.location.formattedAddress[2];
+
+                venuesCollection.addItem( venue );
+            }
         }
 
-        private function _onSearchVenueServiceFault(event:FaultEvent):void {
+        private function _onDummyUserServiceResult(event:ResultEvent):void {
+            trace("Dummy User Returned");
+
+            // TODO: Parse the data from the event.result into a User. Add the user to the AppModel userCollection via AppModel's addUserToCollection()
+        }
+
+        private function _onServiceFault(event:FaultEvent):void {
             trace("Error calling Foursquare Service");
         }
         ]]>
@@ -110,8 +133,15 @@
             resultFormat="text"
             url="{ _searchVenueServiceURL }"
             result="_onSearchVenueServiceResult( event )"
-            fault="_onSearchVenueServiceFault( event )"
+            fault="_onServiceFault( event )"
             showBusyCursor="true" />
+
+        <s:HTTPService id="dummyUserService"
+           resultFormat="e4x"
+           url="assets/data/dummyUser.xml"
+           result="_onDummyUserServiceResult( event )"
+           fault="_onServiceFault( event )"
+           showBusyCursor="true" />
     </fx:Declarations>
 
 </s:ViewNavigatorApplication>

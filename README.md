@@ -1,10 +1,10 @@
 Week6-IndividualCodingAssignment-UserInputDataPersistence
-=========================================================
+* * *
 
 Starter repo for Week 6 - Individual Coding Assignment - User Input and Data Persistence
 
 IntelliJ Module Details
-=======================
+* * *
 
 * Module Type = Flash Module
 * Target = Mobile
@@ -13,3 +13,9 @@ IntelliJ Module Details
 
 * Main MXML File = HelloWorldMain.mxml
 * Application Descriptor = HelloWorldMain-app.xml
+
+
+Android and iOS Files and Folders to package
+* * *
+
+* src/assets

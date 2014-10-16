@@ -8,21 +8,23 @@
 
     <fx:Script>
         <![CDATA[
-            import edu.du.mobile.model.AppModel;
+        import edu.du.mobile.model.AppModel;
+        import edu.du.mobile.model.vo.Venue;
 
-            import mx.events.FlexEvent;
+        import mx.events.FlexEvent;
 
-            import mx.utils.ObjectUtil;
+        import mx.utils.ObjectUtil;
 
-            [Bindable] private var _appModel:AppModel = AppModel.getInstance();
-            [Bindable] private var _venue:Object;
+        [Bindable]
+        private var _appModel:AppModel = AppModel.getInstance();
+        [Bindable]
+        private var _venue:Venue;
 
-            private function _onCreationComplete( event:FlexEvent ):void
-            {
-                trace( ObjectUtil.toString( _appModel.selectedLocation ) );
+        private function _onCreationComplete(event:FlexEvent):void {
+            trace(ObjectUtil.toString(_appModel.selectedVenue));
 
-                _venue = _appModel.selectedLocation;
-            }
+            _venue = _appModel.selectedVenue;
+        }
         ]]>
     </fx:Script>
 
@@ -50,10 +52,10 @@
                backgroundColor="#000000"/>
 
 
-
+            <!-- TODO: Use a PhoneFormatter to guarantee the phone is a specific format: http://flex.apache.org/asdoc/mx/formatters/PhoneFormatter.html -->
             <s:Label text="Phone"
                color="blue"/>
-            <s:Label text="{ _venue.contact.formattedPhone }"/>
+            <s:Label text="{ _venue.contactPhone }"/>
 
             <s:Label text="Website"
                color="blue"/>
@@ -61,8 +63,8 @@
 
             <s:Label text="Address"
                color="blue"/>
-            <s:Label text="{ _venue.location.formattedAddress[0] }"/>
-            <s:Label text="{  _venue.location.formattedAddress[1] }"/>
+            <s:Label text="{ _venue.addressLine1 }"/>
+            <s:Label text="{ _venue.addressLine2 }"/>
 
             <s:HGroup width="100%">
                 <s:Label text="Directions to Here"
