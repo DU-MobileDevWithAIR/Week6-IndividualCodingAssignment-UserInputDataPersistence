@@ -1,5 +1,6 @@
 /**
  * Created by jun on 10/8/14.
+ * Modified by Kami on 10/17/14.
  */
 package edu.du.mobile.model
 {
@@ -70,10 +71,15 @@ import mx.collections.ArrayCollection;
 
         public function addUserToCollection( user:User ):void
         {
+            var fileStream:FileStream = new FileStream();
+
             _userCollection.addItem( user );
             //_updateFile( _userDB );
 
             // TODO: Use a FileStream to update the _userDB with a writeObject( userCollection ) call.
+            // Used as reference: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/filesystem/FileStream.html
+            fileStream.open(_userDB, FileMode.WRITE);
+            fileStream.writeObject( userCollection );
         }
 
         public function addFavoriteToCollection( venue:Venue ):void

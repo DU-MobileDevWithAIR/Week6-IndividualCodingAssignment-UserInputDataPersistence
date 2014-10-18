@@ -1,19 +1,24 @@
 <?xml version="1.0"?>
 <!--
   Created by scotty on 9/21/14.
+  Modified by Kami on 10/17/14.
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
     xmlns:s="library://ns.adobe.com/flex/spark"
+    xmlns:mx="library://ns.adobe.com/flex/mx"
     creationComplete="_onCreationComplete( event )">
 
     <fx:Script>
         <![CDATA[
         import edu.du.mobile.model.AppModel;
         import edu.du.mobile.model.vo.Venue;
+        import edu.du.mobile.control.events.NavigationEvent;
+        import edu.du.mobile.model.constants.ApplicationScreens;
 
         import mx.events.FlexEvent;
-
+        import mx.events.ValidationResultEvent;
         import mx.utils.ObjectUtil;
+        import mx.validators.ValidationResult;
 
         [Bindable]
         private var _appModel:AppModel = AppModel.getInstance();
@@ -25,9 +30,19 @@
 
             _venue = _appModel.selectedVenue;
         }
+
+
+        private function _onBackClick(event:Event):void
+        {
+            dispatchEvent(new NavigationEvent(NavigationEvent.GOTO_SCREEN, ApplicationScreens.LOCATION_FEED_LIST));
+        }
         ]]>
     </fx:Script>
 
+    <fx:Declarations>
+        <mx:PhoneFormatter id="fmtNumber" formatString="(###) ###-####" />
+    </fx:Declarations>
+    
     <s:Scroller top="20" left="20" right="20"
         height="100%">
 
@@ -53,6 +68,7 @@
 
 
             <!-- TODO: Use a PhoneFormatter to guarantee the phone is a specific format: http://flex.apache.org/asdoc/mx/formatters/PhoneFormatter.html -->
+            <!-- Used as reference: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/mx/formatters/PhoneFormatter.html -->
             <s:Label text="Phone"
                color="blue"/>
             <s:Label text="{ _venue.contactPhone }"/>
@@ -73,6 +89,14 @@
                 <s:Label text="Directions from Here"
                     color="blue"/>
             </s:HGroup>
+
+            <s:Button id="back_btn"
+                      label="Back"
+                      left="0"
+                      width="98%"
+                      top="15"
+                      horizontalCenter="0"
+                      click="_onBackClick( event )"/>
 
         </s:VGroup>
 
