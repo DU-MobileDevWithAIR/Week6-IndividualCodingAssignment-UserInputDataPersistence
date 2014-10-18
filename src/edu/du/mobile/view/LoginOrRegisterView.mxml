@@ -5,118 +5,158 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
     xmlns:s="library://ns.adobe.com/flex/spark"
     xmlns:popups="edu.du.mobile.view.popups.*"
+    xmlns:mx="library://ns.adobe.com/flex/mx"
     currentState="register">
 
     <fx:Script>
         <![CDATA[
         import edu.du.mobile.control.events.NavigationEvent;
         import edu.du.mobile.model.constants.ApplicationScreens;
+        import edu.du.mobile.model.AppModel;
+        import edu.du.mobile.model.vo.User;
 
-            import mx.managers.PopUpManager;
+        import mx.managers.PopUpManager;
+        import mx.events.ValidationResultEvent;
 
-            public static const VIEW_STATE_LOGIN:String = "login";
-            public static const VIEW_STATE_REGISTER:String = "register";
+        public static const VIEW_STATE_LOGIN:String = "login";
+        public static const VIEW_STATE_REGISTER:String = "register";
 
-            private const _defaultMessagingPopupTitle:String = "Success";
-            private const _defaultMessagingPopupMessage:String = "successful";
+        private const _defaultMessagingPopupTitle:String = "Success";
+        private const _defaultMessagingPopupMessage:String = "successful";
 
-            [Bindable] public var messagingPopupTitle:String = _defaultMessagingPopupTitle;
-            [Bindable] public var messagingPopupMessage:String = _defaultMessagingPopupMessage;
+        [Bindable]
+        public var messagingPopupTitle:String = _defaultMessagingPopupTitle;
+        [Bindable]
+        public var messagingPopupMessage:String = _defaultMessagingPopupMessage;
 
-            private var _formValidatedSuccessfully:Boolean;
+        [Bindable]
+        private var _appModel:AppModel = AppModel.getInstance();
+        private var _formValidatedSuccessfully:Boolean;
 
 
-            private function _validateLoginData():Boolean
-            {
-                var username:String = username_ti.text;
-                var password:String = password_ti.text;
+        private function _validateLoginData():Boolean {
+            var username:String = username_ti.text;
+            var password:String = password_ti.text;
 
-                if( username == "" || password == "" )
-                {
-                    messagingPopupTitle = "Login Error";
-                    messagingPopupMessage = "Please fill out username/email and password.";
-                    _formValidatedSuccessfully = false;
+            if (username == "" || password == "") {
+                messagingPopupTitle = "Login Error";
+                messagingPopupMessage = "Please fill out username/email and password.";
+                _formValidatedSuccessfully = false;
+            }
+            // TODO: Change this else if to loop through the AppModel's userCollection to compare the username and password against users in the collection.
+            // else if( username.toLowerCase() != "student" || password != "password" )
+            else if (username != "" && password != "") {
+                var loginSuccess:Boolean = false;
+                var usersAmount:int = _appModel.userCollection.length;
+                for (var i:int = 0; i < usersAmount; i++) {
+                    // login form accepts username or email
+                    if (_appModel.userCollection[i].username == username || _appModel.userCollection[i].email == username) {
+                        if (_appModel.userCollection[i].password == password) {
+                            loginSuccess = true;
+                            _launchSuccessfulLogin();
+                        }
+                    }
                 }
-                // TODO: Change this else if to loop through the AppModel's userCollection to compare the username and password against users in the collection.
-                else if( username.toLowerCase() != "student" || password != "password" )
-                {
+                if (loginSuccess == false) {
                     messagingPopupTitle = "Login Error";
                     messagingPopupMessage = "Invalid user/password combination.";
                     _formValidatedSuccessfully = false;
                 }
-                else
-                {
-                    messagingPopupTitle = "Login " + _defaultMessagingPopupTitle;
-                    messagingPopupMessage = "Login " + _defaultMessagingPopupMessage;
-                    _formValidatedSuccessfully = true;
-                }
-                return _formValidatedSuccessfully;
             }
 
-            private function _validateRegistrationData():Boolean
-            {
-                var username:String = reg_username_ti.text;
-                var email:String = reg_email_ti.text;
-                var password:String = password_ti.text;
-                var confirmPassword:String = confirm_password_ti.text;
-                var agreeToTerms:Boolean = agreeToTerms_chk.selected;
+            else {
+                _launchSuccessfulLogin();
+            }
+            return _formValidatedSuccessfully;
+        }
 
-                if( username == ""
+        private function _launchSuccessfulLogin():void {
+            messagingPopupTitle = "Login " + _defaultMessagingPopupTitle;
+            messagingPopupMessage = "Login " + _defaultMessagingPopupMessage;
+            _formValidatedSuccessfully = true;
+        }
+
+        private function _validateRegistrationData():Boolean {
+            var username:String = reg_username_ti.text;
+            var email:String = reg_email_ti.text;
+            var password:String = password_ti.text;
+            var confirmPassword:String = confirm_password_ti.text;
+            var gender:String = genderRBGroup.selectedValue.toString();
+            var agreeToTerms:Boolean = agreeToTerms_chk.selected;
+
+            var emailResult:ValidationResultEvent = email_val.validate();
+
+            if (emailResult.type == ValidationResultEvent.VALID) {
+                reg_email_ti.setStyle('color', 'black');
+            }
+
+            if (emailResult.type == ValidationResultEvent.INVALID) {
+                reg_email_ti.setStyle('color', 'red');
+                messagingPopupTitle = "Validation Error";
+                messagingPopupMessage = "Please use a valid email address.";
+                _formValidatedSuccessfully = false;
+            } else if (username == ""
                     || email == ""
                     || password == ""
                     || confirmPassword == ""
-                    || !agreeToTerms )
-                {
-                    messagingPopupTitle = "Registration Error";
-                    messagingPopupMessage = "Please fill out all required (*) fields.";
-                    _formValidatedSuccessfully = false;
-                }
-                else
-                {
-                    messagingPopupTitle = "Account Creation " + _defaultMessagingPopupTitle;
-                    messagingPopupMessage = "Account creation " + _defaultMessagingPopupMessage;
-                    _formValidatedSuccessfully = true;
-                }
-                return _formValidatedSuccessfully;
+                    || !agreeToTerms) {
+                messagingPopupTitle = "Registration Error";
+                messagingPopupMessage = "Please fill out all required (*) fields.";
+                _formValidatedSuccessfully = false;
+            } else if (password != confirmPassword) {
+                // sharon added confirm passwords match
+                messagingPopupTitle = "Validation Error";
+                messagingPopupMessage = "Your passwords do not match.";
+                _formValidatedSuccessfully = false;
+            }
+            else {
+
+                messagingPopupTitle = "Account Creation " + _defaultMessagingPopupTitle;
+                messagingPopupMessage = "Account creation " + _defaultMessagingPopupMessage;
+                _formValidatedSuccessfully = true;
+            }
+            // Sharon added:  if form validated then save data
+            if (_formValidatedSuccessfully == true) {
+                var user:User = new User();
+                user.username = username;
+                user.email = email;
+                user.password = password;
+                user.gender = gender;
+
+                _appModel.addUserToCollection(user);
+            }
+            return _formValidatedSuccessfully;
+        }
+
+        private function _onSubmitClick(event:Event):void {
+
+            if (this.currentState == VIEW_STATE_LOGIN) {
+                _validateLoginData();
+            }
+            else {
+                _validateRegistrationData();
             }
 
-            private function _onSubmitClick( event:Event ):void
-            {
+            messagingPopup.open(this, true);
+            PopUpManager.centerPopUp(messagingPopup);
+        }
 
-                if( this.currentState  == VIEW_STATE_LOGIN )
-                {
-                    _validateLoginData();
-                }
-                else
-                {
-                    _validateRegistrationData();
-                }
-
-                messagingPopup.open( this, true );
-                PopUpManager.centerPopUp( messagingPopup );
+        private function _onMessagingPopupClose(event:Event):void {
+            if (_formValidatedSuccessfully) {
+                dispatchEvent(new NavigationEvent(NavigationEvent.GOTO_SCREEN, ApplicationScreens.LOCATION_FEED_LIST));
             }
+        }
 
-            private function _onMessagingPopupClose( event:Event ):void
-            {
-                if( _formValidatedSuccessfully )
-                {
-                    dispatchEvent( new NavigationEvent( NavigationEvent.GOTO_SCREEN, ApplicationScreens.LOCATION_FEED_LIST ) );
-                }
+        private function _onLoginOrRegisterToggleClick(event:Event):void {
+            currentState == VIEW_STATE_LOGIN ? currentState = VIEW_STATE_REGISTER : currentState = VIEW_STATE_LOGIN;
+        }
+
+
+        override public function set data(data:Object):void {
+            if (data is String && ( data == ApplicationScreens.LOGIN || data == ApplicationScreens.REGISTER )) {
+                this.currentState = data.toString();
             }
-
-            private function _onLoginOrRegisterToggleClick( event:Event ):void
-            {
-                currentState == VIEW_STATE_LOGIN ? currentState = VIEW_STATE_REGISTER : currentState = VIEW_STATE_LOGIN;
-            }
-
-
-            override public function set data( data:Object ):void
-            {
-                if( data is String && ( data == ApplicationScreens.LOGIN || data == ApplicationScreens.REGISTER ) )
-                {
-                    this.currentState = data.toString();
-                }
-            }
+        }
         ]]>
     </fx:Script>
 
@@ -130,6 +170,10 @@
             close="_onMessagingPopupClose( event )"/>
 
         <!-- TODO: Add an EmailValidator and use it to validate the email field when the user registers: https://flex.apache.org/asdoc/mx/validators/EmailValidator.html -->
+        <mx:EmailValidator id="email_val"
+                             source="{reg_email_ti}"
+                             property="text"
+                             required="true" />
     </fx:Declarations>
 
 

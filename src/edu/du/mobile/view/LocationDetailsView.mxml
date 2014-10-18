@@ -4,6 +4,7 @@
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
     xmlns:s="library://ns.adobe.com/flex/spark"
+    xmlns:mx="library://ns.adobe.com/flex/mx"
     creationComplete="_onCreationComplete( event )">
 
     <fx:Script>
@@ -12,8 +13,12 @@
         import edu.du.mobile.model.vo.Venue;
 
         import mx.events.FlexEvent;
+        import mx.formatters.PhoneFormatter;
 
         import mx.utils.ObjectUtil;
+        import mx.events.ValidationResultEvent;
+
+        private var vResult:ValidationResultEvent;
 
         [Bindable]
         private var _appModel:AppModel = AppModel.getInstance();
@@ -24,10 +29,26 @@
             trace(ObjectUtil.toString(_appModel.selectedVenue));
 
             _venue = _appModel.selectedVenue;
+            _formatPhone();
+        }
+        // Event handler to validate and format phone.
+        private function _formatPhone():void {
+            vResult = phoneNumberValid.validate();
+            if (vResult.type == ValidationResultEvent.VALID) {
+                // must be number
+                var tempPhone:Number = Number(phone.text.replace(/[^0-9]/g,""));
+                phone.text = phoneFormatter.format(tempPhone);
+            } else {
+                phone.text = "N/A";
+            }
         }
         ]]>
     </fx:Script>
+    <fx:Declarations>
+        <mx:PhoneFormatter id="phoneFormatter" areaCodeFormat="(###)" formatString="(###) ###-####" validPatternChars="#-() "/>
 
+        <mx:PhoneNumberValidator id="phoneNumberValid" source="{phone}" property="text"/>
+    </fx:Declarations>
     <s:Scroller top="20" left="20" right="20"
         height="100%">
 
@@ -55,7 +76,8 @@
             <!-- TODO: Use a PhoneFormatter to guarantee the phone is a specific format: http://flex.apache.org/asdoc/mx/formatters/PhoneFormatter.html -->
             <s:Label text="Phone"
                color="blue"/>
-            <s:Label text="{ _venue.contactPhone }"/>
+            <s:Label text="{ _venue.contactPhone }"
+                     id="phone"/>
 
             <s:Label text="Website"
                color="blue"/>
