@@ -50,7 +50,6 @@
                 var usersAmount:int = _appModel.userCollection.length;
                 for (var i:int = 0; i < usersAmount; i++) {
                     // login form accepts username or email
-                    trace(_appModel.userCollection[i].username);
                     if (_appModel.userCollection[i].username == username || _appModel.userCollection[i].email == username) {
                         if (_appModel.userCollection[i].password == password) {
                             loginSuccess = true;
