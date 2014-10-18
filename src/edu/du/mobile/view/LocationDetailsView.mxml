@@ -29,19 +29,15 @@
             trace(ObjectUtil.toString(_appModel.selectedVenue));
 
             _venue = _appModel.selectedVenue;
-            _formatPhone();
+           // _formatPhone();
         }
         // Event handler to validate and format input.
         private function _formatPhone():void {
-
             vResult = phoneNumberValid.validate();
-            trace(vResult);
-            if (vResult.type == ValidationResultEvent.INVALID) {
-                trace('before'+phone.text);
-                phone.text = phoneFormatter.format(phone.text);
-                trace('asfter'+phoneFormatter.error);
+            if (vResult.type == ValidationResultEvent.VALID) {
+                // must be number
+                phone.text = phoneFormatter.format(Number(phone.text));
             } else {
-                trace('invaleid');
                 phone.text = "N/A";
             }
         }
