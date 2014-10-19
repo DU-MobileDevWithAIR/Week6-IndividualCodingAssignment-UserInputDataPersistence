@@ -4,13 +4,14 @@
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
     xmlns:s="library://ns.adobe.com/flex/spark"
+    xmlns:mx="library://ns.adobe.com/flex/mx"
     creationComplete="_onCreationComplete( event )">
 
     <fx:Script>
         <![CDATA[
         import edu.du.mobile.model.AppModel;
+        import edu.du.mobile.model.vo.Favorite;
         import edu.du.mobile.model.vo.Venue;
-
         import mx.events.FlexEvent;
 
         import mx.utils.ObjectUtil;
@@ -19,20 +20,56 @@
         private var _appModel:AppModel = AppModel.getInstance();
         [Bindable]
         private var _venue:Venue;
+        private var _userFavs:Boolean;
+        private var _newFav:Favorite = new Favorite();
+
 
         private function _onCreationComplete(event:FlexEvent):void {
             trace(ObjectUtil.toString(_appModel.selectedVenue));
-
             _venue = _appModel.selectedVenue;
+            _newFav.username = _appModel.loggedInUser.username;
+            _newFav.venue = _appModel.selectedVenue.name;
+            _userFavs = _appModel.isUserFavorite(_newFav);
+            trace("_userFavs:" + _userFavs);
+            if (_userFavs == false)
+            {
+                this.currentState = 'isNotFavorite';
+            }
+            else {
+                this.currentState = 'isFavorite';
+            }
         }
+        private function _toggleFavorite() {
+            if(this.currentState == 'isNotFavorite') {
+                _appModel.addFavoriteToCollection(_newFav);
+                this.currentState = 'isFavorite';
+            }
+            else {
+                _appModel.removeFavoriteFromCollection(_newFav);
+                this.currentState = 'isNotFavorite';
+            }
+        }
+
         ]]>
     </fx:Script>
-
+    <fx:Declarations>
+        <!-- constructor from adobe guide -->
+        <mx:PhoneFormatter id="phoneFormatter"
+                           formatString="(###) ###-####" validPatternChars="#-() "/>
+    </fx:Declarations>
+    <s:states>
+        <s:State name="isNotFavorite"/>
+        <s:State name="isFavorite"/>
+    </s:states>
     <s:Scroller top="20" left="20" right="20"
         height="100%">
 
         <s:VGroup >
+            <s:Label text="Back to List" click="navigator.pushView(LocationFeedListView)" />
+            <!-- for abi testing -->
+            <!--<s:Label text="Manage" click="navigator.pushView(ManageView)" />-->
 
+            <s:Label id="favsTogglerLabel" click="_toggleFavorite()" text.isNotFavorite="&#9734; Add to Favorites" text.isFavorite="&#9733; Remove from Favorites" />
             <s:Label text="{ _venue.name }"
                      width="80%"/>
 
@@ -52,10 +89,10 @@
                backgroundColor="#000000"/>
 
 
-            <!-- TODO: Use a PhoneFormatter to guarantee the phone is a specific format: http://flex.apache.org/asdoc/mx/formatters/PhoneFormatter.html -->
+            <!-- TO-DONE: Use a PhoneFormatter to guarantee the phone is a specific format: http://flex.apache.org/asdoc/mx/formatters/PhoneFormatter.html -->
             <s:Label text="Phone"
                color="blue"/>
-            <s:Label text="{ _venue.contactPhone }"/>
+            <s:Label text="{ phoneFormatter.format(_venue.contactPhone) }"/>
 
             <s:Label text="Website"
                color="blue"/>

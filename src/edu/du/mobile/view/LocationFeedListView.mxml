@@ -23,9 +23,7 @@
         }
 
         private function _onListChange(event:Event):void {
-
             _appModel.selectedVenue = locationList.selectedItem;
-
             dispatchEvent(new NavigationEvent(NavigationEvent.GOTO_SCREEN, ApplicationScreens.LOCATION_DETAILS));
         }
         ]]>
@@ -37,14 +35,14 @@
 
 
     <s:HGroup>
-        <s:Label text="Nearby Locations"
-            paddingLeft="125"/>
+        <s:Label text="Nearby Locations to {_appModel.loggedInUser.username}" />
         <s:Label text="Done"
             fontSize="18"
             color="blue"
             paddingLeft="70"/>
     </s:HGroup>
-
+    <!-- for abi testing -->
+    <!--<s:Label text="Manage" click="navigator.pushView(ManageView)" />-->
     <s:List id="locationList"
         top="100"
         width="100%"
