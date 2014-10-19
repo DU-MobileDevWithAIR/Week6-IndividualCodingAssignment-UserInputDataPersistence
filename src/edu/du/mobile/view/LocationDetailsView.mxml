@@ -4,6 +4,7 @@
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
     xmlns:s="library://ns.adobe.com/flex/spark"
+    xmlns:mx="library://ns.adobe.com/flex/mx"
     creationComplete="_onCreationComplete( event )">
 
     <fx:Script>
@@ -20,13 +21,40 @@
         [Bindable]
         private var _venue:Venue;
 
+        import mx.events.ValidationResultEvent;
+
+        private var vResult:ValidationResultEvent;
+
+        // Event handler to validate and format input.
+      /*  private function _validatePhone():void {
+            vResult = pnVal.validate();
+            if (vResult.type == ValidationResultEvent.VALID) {
+                phoneNmbr.text = phoneFormatter.format(phoneNmbr.text);
+            } else {
+                phoneNmbr.text = "Not Available";
+            }
+        }*/
+
+
+
         private function _onCreationComplete(event:FlexEvent):void {
             trace(ObjectUtil.toString(_appModel.selectedVenue));
 
             _venue = _appModel.selectedVenue;
         }
+
+
         ]]>
     </fx:Script>
+
+    <fx:Declarations>
+        <mx:PhoneFormatter id="phoneFormatter"
+                           formatString="(###) ###-####"
+                           validPatternChars="#-() "/>
+
+        <!--<mx:PhoneNumberValidator id="pnVal" source="{phoneNmbr}" property="text"
+                                 allowedFormatChars=""/>-->
+    </fx:Declarations>
 
     <s:Scroller top="20" left="20" right="20"
         height="100%">
@@ -55,7 +83,8 @@
             <!-- TODO: Use a PhoneFormatter to guarantee the phone is a specific format: http://flex.apache.org/asdoc/mx/formatters/PhoneFormatter.html -->
             <s:Label text="Phone"
                color="blue"/>
-            <s:Label text="{ _venue.contactPhone }"/>
+            <s:Label text="{ phoneFormatter.format(_venue.contactPhone) }"
+                    id="phoneNmbr"/>
 
             <s:Label text="Website"
                color="blue"/>
