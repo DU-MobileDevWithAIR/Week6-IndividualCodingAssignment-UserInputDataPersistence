@@ -3,17 +3,22 @@
   Created by scotty on 9/21/14.
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
-    xmlns:s="library://ns.adobe.com/flex/spark"
-    creationComplete="_onCreationComplete( event )">
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:mx="library://ns.adobe.com/flex/mx"
+        creationComplete="_onCreationComplete( event )">
 
     <fx:Script>
         <![CDATA[
+        import edu.du.mobile.control.events.NavigationEvent;
         import edu.du.mobile.model.AppModel;
+        import edu.du.mobile.model.constants.ApplicationScreens;
         import edu.du.mobile.model.vo.Venue;
-
         import mx.events.FlexEvent;
-
         import mx.utils.ObjectUtil;
+        import mx.events.ValidationResultEvent;
+        import mx.formatters.PhoneFormatter;
+
+        private var vResult:ValidationResultEvent;
 
         [Bindable]
         private var _appModel:AppModel = AppModel.getInstance();
@@ -24,12 +29,35 @@
             trace(ObjectUtil.toString(_appModel.selectedVenue));
 
             _venue = _appModel.selectedVenue;
+            _formatPhone();
+        }
+        // Event handler to validate and format input.
+        private function _formatPhone():void {
+            vResult = pnVal.validate();
+            if (vResult.type == ValidationResultEvent.VALID) {
+                contactPhone.text = phoneFormatter.format(phone.text);
+            } else {
+                contactPhone.text = "";
+            }
+        }
+
+        private function _onBackBtn(event:Event):void
+        {
+            dispatchEvent(new NavigationEvent(NavigationEvent.GOTO_SCREEN, ApplicationScreens.LOCATION_FEED_LIST));
         }
         ]]>
     </fx:Script>
 
+    <fx:Declarations>
+        <mx:PhoneFormatter id="phoneFormatter"
+                           formatString="(###) ###-####" validPatternChars="#-() "/>
+
+        <mx:PhoneNumberValidator id="pnVal" source="{phone}" property="text"
+                                 allowedFormatChars=""/>
+    </fx:Declarations>
+
     <s:Scroller top="20" left="20" right="20"
-        height="100%">
+                height="100%">
 
         <s:VGroup >
 
@@ -38,41 +66,49 @@
 
             <s:HGroup>
                 <s:Label text="Map"
-                   color="blue"
-                   paddingLeft="25"/>
+                         color="blue"
+                         paddingLeft="25"/>
 
                 <s:Label text="Share"
-                   color="blue"
-                   paddingLeft="70"/>
+                         color="blue"
+                         paddingLeft="70"/>
             </s:HGroup>
 
             <s:Image id="locationImage"
-               height="300"
-               width="100%"
-               backgroundColor="#000000"/>
-
+                     height="300"
+                     width="100%"
+                     backgroundColor="#000000"/>
 
             <!-- TODO: Use a PhoneFormatter to guarantee the phone is a specific format: http://flex.apache.org/asdoc/mx/formatters/PhoneFormatter.html -->
-            <s:Label text="Phone"
-               color="blue"/>
-            <s:Label text="{ _venue.contactPhone }"/>
+
+            <s:Label text="Phone" id="phone"
+                     color="blue"/>
+            <s:Label text="{ _venue.contactPhone }" id="contactPhone"/>
 
             <s:Label text="Website"
-               color="blue"/>
+                     color="blue"/>
             <s:Label text="N/A"/>
 
             <s:Label text="Address"
-               color="blue"/>
+                     color="blue"/>
             <s:Label text="{ _venue.addressLine1 }"/>
             <s:Label text="{ _venue.addressLine2 }"/>
 
             <s:HGroup width="100%">
                 <s:Label text="Directions to Here"
-                    color="blue"/>
+                         color="blue"/>
                 <s:Spacer width="100%"/>
                 <s:Label text="Directions from Here"
-                    color="blue"/>
+                         color="blue"/>
             </s:HGroup>
+
+            <s:Button id="backBtn"
+                      label="Back"
+                      left="0"
+                      width="98%"
+                      top="15"
+                      horizontalCenter="0"
+                      click="_onBackBtn( event )"/>
 
         </s:VGroup>
 
