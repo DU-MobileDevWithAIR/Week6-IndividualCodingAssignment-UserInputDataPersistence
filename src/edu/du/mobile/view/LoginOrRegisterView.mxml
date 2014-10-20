@@ -160,7 +160,6 @@
         <!-- TODO: Add an EmailValidator and use it to validate the email field when the user registers: https://flex.apache.org/asdoc/mx/validators/EmailValidator.html - Done -->
         <mx:EmailValidator id="email_val"
                       source="{reg_email_ti}"
-                      trigger="{submit_btn}"
                       triggerEvent="click"
                       property="text"
                       />
@@ -237,6 +236,7 @@
                 <s:CheckBox id="agreeToTerms_chk"/>
                 <s:Label text="agree to terms *"/>
             </s:HGroup>
+
 
             <s:Button id="submit_btn"
                       label="submit"

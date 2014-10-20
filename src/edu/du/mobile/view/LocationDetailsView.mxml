@@ -83,9 +83,8 @@
             <!-- TODO: Use a PhoneFormatter to guarantee the phone is a specific format: http://flex.apache.org/asdoc/mx/formatters/PhoneFormatter.html -->
             <s:Label text="Phone"
                color="blue"/>
-            <s:Label text="{ phoneFormatter.format(_venue.contactPhone) }"
+           <s:Label text="{ phoneFormatter.format(_venue.contactPhone) }"
                     id="phoneNmbr"/>
-
             <s:Label text="Website"
                color="blue"/>
             <s:Label text="N/A"/>
