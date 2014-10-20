@@ -71,9 +71,15 @@ import mx.collections.ArrayCollection;
         public function addUserToCollection( user:User ):void
         {
             _userCollection.addItem( user );
-            //_updateFile( _userDB );
+
+            _updateFile( _userDB );
 
             // TODO: Use a FileStream to update the _userDB with a writeObject( userCollection ) call.
+
+            var fileStream:FileStream = new FileStream();
+            fileStream.open( _userDB, FileMode.WRITE );
+            fileStream.writeObject( userCollection );
+            fileStream.close();
         }
 
         public function addFavoriteToCollection( venue:Venue ):void

@@ -3,8 +3,8 @@
   Created by scotty on 9/21/14.
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
-    xmlns:s="library://ns.adobe.com/flex/spark"
-    creationComplete="_onCreationComplete( event )">
+        xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"
+        creationComplete="_onCreationComplete( event )">
 
     <fx:Script>
         <![CDATA[
@@ -24,9 +24,28 @@
             trace(ObjectUtil.toString(_appModel.selectedVenue));
 
             _venue = _appModel.selectedVenue;
+
+        Format();
+
+        }
+
+
+        private function Format():void {
+            trace(_venue.contactPhone);
+            if (_venue.contactPhone != null) {
+                formattedPhone.text = phoneFormatter.format(_venue.contactPhone.toString());
+            } else {
+                formattedPhone.text = "No Number"
+            }
         }
         ]]>
     </fx:Script>
+
+    <fx:Declarations>
+        <mx:PhoneFormatter id="phoneFormatter"
+                           formatString="(###) ###-####" validPatternChars="#-() "/>
+
+    </fx:Declarations>
 
     <s:Scroller top="20" left="20" right="20"
         height="100%">
@@ -55,7 +74,7 @@
             <!-- TODO: Use a PhoneFormatter to guarantee the phone is a specific format: http://flex.apache.org/asdoc/mx/formatters/PhoneFormatter.html -->
             <s:Label text="Phone"
                color="blue"/>
-            <s:Label text="{ _venue.contactPhone }"/>
+            <s:Label id="formattedPhone" text=""/>
 
             <s:Label text="Website"
                color="blue"/>
