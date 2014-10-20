@@ -13,7 +13,9 @@
         import edu.du.mobile.control.events.VenueDataEvent;
         import edu.du.mobile.control.events.NavigationEvent;
         import edu.du.mobile.model.AppModel;
+        import edu.du.mobile.model.AppModel;
         import edu.du.mobile.model.constants.ApplicationScreens;
+        import edu.du.mobile.model.vo.User;
         import edu.du.mobile.model.vo.Venue;
         import edu.du.mobile.view.LocationDetailsView;
         import edu.du.mobile.view.LocationFeedListView;
@@ -25,6 +27,7 @@
         import mx.rpc.Fault;
         import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
+        import mx.utils.ObjectUtil;
         import mx.utils.ObjectUtil;
 
         // https://developer.foursquare.com/docs/venues/search
@@ -62,7 +65,11 @@
 
 
             // TODO: Only make this HTTPService call if the _appModel.userCollection has no users in it.
-            dummyUserService.send();
+            var users:Number = _appModel.userCollection.length;
+            trace("users = " + users);
+            if ( users == 0 ) {
+                dummyUserService.send();
+            }
         }
 
         private function _onGotoScreen(event:NavigationEvent):void {
@@ -103,23 +110,31 @@
             var venuesCollection:ArrayCollection = _appModel.venuesCollection;
             var venueData:Object = JSON.parse(event.result.toString());
 
-            for each( var venueData:Object in venueData.response.venues )
-            {
-                trace( venueData.name );
+            for each(var venueData:Object in venueData.response.venues) {
+                trace(venueData.name);
                 var venue:Venue = new Venue();
-                    venue.name = venueData.name;
-                    venue.contactPhone = venueData.contact.formattedPhone;
-                    venue.addressLine1 = venueData.location.formattedAddress[0];
-                    venue.addressLine2 = venueData.location.formattedAddress[2];
+                venue.name = venueData.name;
+                venue.contactPhone = venueData.contact.formattedPhone;
+                venue.addressLine1 = venueData.location.formattedAddress[0];
+                venue.addressLine2 = venueData.location.formattedAddress[2];
 
-                venuesCollection.addItem( venue );
+                venuesCollection.addItem(venue);
             }
         }
 
         private function _onDummyUserServiceResult(event:ResultEvent):void {
             trace("Dummy User Returned");
-
             // TODO: Parse the data from the event.result into a User. Add the user to the AppModel userCollection via AppModel's addUserToCollection()
+
+            var userXML:XML = event.result as XML;
+            _appModel = AppModel.getInstance();
+            var userVO = new User();
+            userVO.username = userXML.username;
+            userVO.email = userXML.email;
+            userVO.password = userXML.password;
+            userVO.gender = userXML.gender;
+            _appModel.addUserToCollection(userVO);
+
         }
 
         private function _onServiceFault(event:FaultEvent):void {
