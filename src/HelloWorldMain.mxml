@@ -18,6 +18,7 @@
         import edu.du.mobile.view.LocationDetailsView;
         import edu.du.mobile.view.LocationFeedListView;
         import edu.du.mobile.view.LoginOrRegisterView;
+        import edu.du.mobile.model.vo.User;
 
         import mx.collections.ArrayCollection;
 
@@ -60,9 +61,9 @@
 
             dispatchEvent(new NavigationEvent(NavigationEvent.GOTO_SCREEN, ApplicationScreens.LOGIN));
 
-
-            // TODO: Only make this HTTPService call if the _appModel.userCollection has no users in it.
-            dummyUserService.send();
+            if (_appModel.userCollection.length === 0) {
+                           dummyUserService.send();
+                         }
         }
 
         private function _onGotoScreen(event:NavigationEvent):void {
@@ -118,8 +119,14 @@
 
         private function _onDummyUserServiceResult(event:ResultEvent):void {
             trace("Dummy User Returned");
+            var xml:XML = new XML(event.result);
+                       var user:User = new User();
+                        user.username = xml.username;
+                        user.email = xml.email;
+                        user.password = xml.password;
+                        user.gender = xml.gender;
 
-            // TODO: Parse the data from the event.result into a User. Add the user to the AppModel userCollection via AppModel's addUserToCollection()
+                        _appModel.addUserToCollection(user);
         }
 
         private function _onServiceFault(event:FaultEvent):void {

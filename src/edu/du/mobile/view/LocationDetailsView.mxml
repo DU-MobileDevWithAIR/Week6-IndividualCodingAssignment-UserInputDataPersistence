@@ -4,29 +4,58 @@
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
     xmlns:s="library://ns.adobe.com/flex/spark"
+    xmlns:mx="library://ns.adobe.com/flex/mx"
     creationComplete="_onCreationComplete( event )">
 
     <fx:Script>
         <![CDATA[
         import edu.du.mobile.model.AppModel;
         import edu.du.mobile.model.vo.Venue;
-
-        import mx.events.FlexEvent;
-
         import mx.utils.ObjectUtil;
+        import mx.events.ValidationResultEvent;
+        import mx.events.FlexEvent;
+        import mx.formatters.PhoneFormatter;
+
+
 
         [Bindable]
         private var _appModel:AppModel = AppModel.getInstance();
         [Bindable]
         private var _venue:Venue;
 
+        private var vResult:ValidationResultEvent;
+
         private function _onCreationComplete(event:FlexEvent):void {
+
             trace(ObjectUtil.toString(_appModel.selectedVenue));
 
             _venue = _appModel.selectedVenue;
+
+            _phoneFormation();
         }
+
+// Needed to look at examples to help. Had a look at Sclarks code and that did the trick, function based off of sclark's solution 10/18/2014
+        private function _phoneFormation():void {
+            vResult = phoneNumberValid.validate();
+            if (vResult.type == ValidationResultEvent.VALID) {
+              var tempPhone:Number = Number(contactPhone.text.replace(/[^0-9]/g,""));
+                contactPhone.text = phoneFormatter.format(tempPhone);
+                } else {
+                contactPhone.text = "N/A";
+                }
+        }
+
+
+
         ]]>
     </fx:Script>
+
+    <fx:Declarations>
+      <mx:PhoneFormatter id="phoneFormatter" areaCodeFormat="(###)" formatString="(###) ###-####" validPatternChars="#-() "/>
+      <mx:PhoneNumberValidator id="phoneNumberValid" source="{contactPhone}" property="text"/>
+     </fx:Declarations>
+
+
 
     <s:Scroller top="20" left="20" right="20"
         height="100%">
@@ -51,11 +80,10 @@
                width="100%"
                backgroundColor="#000000"/>
 
-
-            <!-- TODO: Use a PhoneFormatter to guarantee the phone is a specific format: http://flex.apache.org/asdoc/mx/formatters/PhoneFormatter.html -->
             <s:Label text="Phone"
                color="blue"/>
-            <s:Label text="{ _venue.contactPhone }"/>
+            <s:Label text="{ _venue.contactPhone }"
+               id="contactPhone"/>
 
             <s:Label text="Website"
                color="blue"/>
