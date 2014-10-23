@@ -29,8 +29,19 @@
             trace(ObjectUtil.toString(_appModel.selectedVenue));
 
             _venue = _appModel.selectedVenue;
+            formatPhone ();
         }
 
+        //create N/A if there is no number and format if there is.
+        private function formatPhone():void
+        {
+            if (_venue.contactPhone != null)
+            {
+                phNumberFormatted.text = phoneFormatter.format(_venue.contactPhone.toString());
+            } else {
+                phNumberFormatted.text = "N/A"
+            }
+        }
 
         private function _onBackClick(event:Event):void
         {
@@ -40,9 +51,11 @@
     </fx:Script>
 
     <fx:Declarations>
-        <mx:PhoneFormatter id="fmtNumber" formatString="(###) ###-####" />
+        <mx:PhoneFormatter id="phoneFormatter"
+                           formatString="(###) ###-####"
+                           validPatternChars="#-() " />
     </fx:Declarations>
-    
+
     <s:Scroller top="20" left="20" right="20"
         height="100%">
 
@@ -71,7 +84,8 @@
             <!-- Used as reference: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/mx/formatters/PhoneFormatter.html -->
             <s:Label text="Phone"
                color="blue"/>
-            <s:Label text="{ _venue.contactPhone }"/>
+            <s:Label text=""
+                     id="phNumberFormatted" />
 
             <s:Label text="Website"
                color="blue"/>

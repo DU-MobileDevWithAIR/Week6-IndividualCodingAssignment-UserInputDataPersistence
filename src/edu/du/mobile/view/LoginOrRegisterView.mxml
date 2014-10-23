@@ -5,6 +5,7 @@
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
     xmlns:s="library://ns.adobe.com/flex/spark"
+    xmlns:mx="library://ns.adobe.com/flex/mx"
     xmlns:popups="edu.du.mobile.view.popups.*"
     currentState="register">
 
@@ -12,8 +13,11 @@
         <![CDATA[
         import edu.du.mobile.control.events.NavigationEvent;
         import edu.du.mobile.model.constants.ApplicationScreens;
+        import edu.du.mobile.model.AppModel;
+        import edu.du.mobile.model.vo.User;
 
             import mx.managers.PopUpManager;
+            import mx.events.ValidationResultEvent;
 
             public static const VIEW_STATE_LOGIN:String = "login";
             public static const VIEW_STATE_REGISTER:String = "register";
@@ -24,6 +28,7 @@
             [Bindable] public var messagingPopupTitle:String = _defaultMessagingPopupTitle;
             [Bindable] public var messagingPopupMessage:String = _defaultMessagingPopupMessage;
 
+            private var _appModel:AppModel = AppModel.getInstance();
             private var _formValidatedSuccessfully:Boolean;
 
 
@@ -39,7 +44,18 @@
                     _formValidatedSuccessfully = false;
                 }
                 // TODO: Change this else if to loop through the AppModel's userCollection to compare the username and password against users in the collection.
-                else if( username.toLowerCase() != "student" || password != "password" )
+                else if( username != "" && password != "" )
+
+                var validUser = false;
+                for (var i:Object in _appModel.userCollection)
+                {
+                    if (_appModel.userCollection[i].username == username && _appModel.userCollection[i].password == password)
+                    {
+                        validUser = true;
+                        _appModel.loggedInUser = _appModel.userCollection[i];
+                    }
+                }
+                if (validUser == false)
                 {
                     messagingPopupTitle = "Login Error";
                     messagingPopupMessage = "Invalid user/password combination.";
@@ -131,6 +147,17 @@
             close="_onMessagingPopupClose( event )"/>
 
         <!-- TODO: Add an EmailValidator and use it to validate the email field when the user registers: https://flex.apache.org/asdoc/mx/validators/EmailValidator.html -->
+        <mx:EmailValidator id="emailValidator"
+                           source="{reg_email_ti}"
+                           property="text"
+                           trigger="{loginOrRegisterToggle}"
+                           triggerEvent="click"
+                           invalidCharError="Your e-mail address contains invalid characters."
+                           invalidDomainError= "The domain in your e-mail address is incorrectly formatted."
+                           invalidIPDomainError="The IP domain in your e-mail address is incorrectly formatted."
+                           invalidPeriodsInDomainError="The domain in your e-mail address has consecutive periods."
+                           missingPeriodInDomainError="The domain in your e-mail address is missing a period."
+                           missingUsernameError="The username in your e-mail address is missing." />
     </fx:Declarations>
 
 
