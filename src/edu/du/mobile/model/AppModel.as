@@ -76,7 +76,7 @@ import mx.collections.ArrayCollection;
             // TODO: Use a FileStream to update the _userDB with a writeObject( userCollection ) call. - Done
             var fileStream:FileStream = new FileStream();
 
-            fileStream.open(_userDB, FileMode.UPDATE);
+            fileStream.open(_userDB, FileMode.WRITE);
             fileStream.writeObject(userCollection);
         }
 
