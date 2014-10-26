@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
   Created by jun on 9/14/14.
+  Modified by Kami on 10/17/14.
 -->
 <s:ViewNavigatorApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
     xmlns:s="library://ns.adobe.com/flex/spark"
@@ -8,12 +9,17 @@
     applicationDPI="320"
     applicationComplete="_onApplicationComplete( event )">
 
+    <s:navigationContent>
+        <s:Button label="Home" click="navigator.popToFirstView()"/>
+    </s:navigationContent>
+
     <fx:Script>
         <![CDATA[
         import edu.du.mobile.control.events.VenueDataEvent;
         import edu.du.mobile.control.events.NavigationEvent;
         import edu.du.mobile.model.AppModel;
         import edu.du.mobile.model.constants.ApplicationScreens;
+        import edu.du.mobile.model.vo.User;
         import edu.du.mobile.model.vo.Venue;
         import edu.du.mobile.view.LocationDetailsView;
         import edu.du.mobile.view.LocationFeedListView;
@@ -62,7 +68,12 @@
 
 
             // TODO: Only make this HTTPService call if the _appModel.userCollection has no users in it.
-            dummyUserService.send();
+            if(_appModel.userCollection.length == 0)
+
+            {
+                dummyUserService.send();
+                    trace("No Users");
+            }
         }
 
         private function _onGotoScreen(event:NavigationEvent):void {
@@ -86,7 +97,7 @@
                 default:
                 {
                 }
-                    ;
+
             }
         }
 
@@ -120,6 +131,21 @@
             trace("Dummy User Returned");
 
             // TODO: Parse the data from the event.result into a User. Add the user to the AppModel userCollection via AppModel's addUserToCollection()
+            // Used as reference: http://spreadingfunkyness.com/parsing-xml-in-flex-the-case-of-tag-names-with-a-dash/
+            // Used as reference: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/XML.html
+
+            var userCollection:ArrayCollection = _appModel.userCollection;
+            var xml:XML = new XML(event.result);
+
+            var user:User = new User();
+            user.username = xml.username;
+            user.email = xml.email;
+            user.password = xml.password;
+            user.gender = xml.gender;
+
+            _appModel.addUserToCollection(user);
+            trace( user.username );
+
         }
 
         private function _onServiceFault(event:FaultEvent):void {
