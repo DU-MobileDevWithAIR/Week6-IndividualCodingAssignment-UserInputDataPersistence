@@ -17,8 +17,6 @@ import flash.filesystem.FileStream;
 
 import mx.collections.ArrayCollection;
 
-import mx.collections.ArrayCollection;
-
     public class AppModel extends EventDispatcher
     {
         private static var _instance:AppModel;
@@ -69,19 +67,19 @@ import mx.collections.ArrayCollection;
             return _instance;
         }
 
-        public function addUserToCollection( user:User ):void
-        {
-            var fileStream:FileStream = new FileStream();
-
-            _userCollection.addItem( user );
+        public function addUserToCollection( user:User ):void {
+            _userCollection.addItem(user);
             //_updateFile( _userDB );
 
             // TODO: Use a FileStream to update the _userDB with a writeObject( userCollection ) call.
             // Used as reference: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/filesystem/FileStream.html
+            var file:File = File.documentsDirectory;
+            var fileStream:FileStream = new FileStream();
             fileStream.open(_userDB, FileMode.WRITE);
             fileStream.writeObject( userCollection );
-        }
+            fileStream.close();
 
+        }
         public function addFavoriteToCollection( venue:Venue ):void
         {
             _favoritesCollection.addItem( venue );
@@ -93,6 +91,7 @@ import mx.collections.ArrayCollection;
            // STUB
         }
 
+        var fileStream:FileStream = new FileStream();
         //////////////////////////
 
         public function get userCollection():ArrayCollection
@@ -131,9 +130,13 @@ import mx.collections.ArrayCollection;
         {
             return _loggedInUser;
         }
+
         public function set loggedInUser( value:User ):void
         {
             _loggedInUser = value;
+        }
+        function fileClosed(event:Event):void {
+            trace("closed");
         }
     }
 }
