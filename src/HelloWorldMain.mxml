@@ -108,7 +108,7 @@
             var venuesCollection:ArrayCollection = _appModel.venuesCollection;
             var venueData:Object = JSON.parse(event.result.toString());
 
-            for each( var venueData:Object in venueData.response.venues )
+            for each(venueData in venueData.response.venues )
             {
                 trace( venueData.name );
                 var venue:Venue = new Venue();

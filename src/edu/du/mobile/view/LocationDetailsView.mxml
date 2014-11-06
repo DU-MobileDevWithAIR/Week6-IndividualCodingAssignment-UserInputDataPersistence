@@ -35,12 +35,24 @@
             }
         }*/
 
+       // private var vResult:ValidationResultEvent;
 
+        // Event handler to validate and format input.
+        private function Format():void {
+            vResult = pnVal.validate();
+            if (vResult.type == ValidationResultEvent.VALID) {
+                phoneNmbr.text = phoneFormatter.format(prePhone);
+            } else {
+                phoneNmbr.text = "N/A";
+            }
+        }
 
         private function _onCreationComplete(event:FlexEvent):void {
             trace(ObjectUtil.toString(_appModel.selectedVenue));
 
             _venue = _appModel.selectedVenue;
+
+            Format();
         }
 
 
@@ -49,8 +61,10 @@
 
     <fx:Declarations>
         <mx:PhoneFormatter id="phoneFormatter"
-                           formatString="(###) ###-####"
-                           validPatternChars="#-() "/>
+                           formatString="(###) ###-####" validPatternChars="#-() "/>
+
+        <mx:PhoneNumberValidator id="pnVal" source="{prePhone}" property="text"
+                                 allowedFormatChars=""/>
 
         <!--<mx:PhoneNumberValidator id="pnVal" source="{phoneNmbr}" property="text"
                                  allowedFormatChars=""/>-->
@@ -81,10 +95,13 @@
 
 
             <!-- TODO: Use a PhoneFormatter to guarantee the phone is a specific format: http://flex.apache.org/asdoc/mx/formatters/PhoneFormatter.html -->
+            <s:Label text="{_venue.contactPhone}" id="prePhone"
+                     color="white"/>
             <s:Label text="Phone"
                color="blue"/>
-           <s:Label text="{ phoneFormatter.format(_venue.contactPhone) }"
+           <s:Label text=""
                     id="phoneNmbr"/>
+
             <s:Label text="Website"
                color="blue"/>
             <s:Label text="N/A"/>

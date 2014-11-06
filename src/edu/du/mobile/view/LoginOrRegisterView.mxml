@@ -26,7 +26,7 @@
             private const _defaultMessagingPopupTitle:String = "Success";
             private const _defaultMessagingPopupMessage:String = "successful";
 
-            private const _invalidEmailMessage = "Invalid Email";
+            private const _invalidEmailMessage:String = "Invalid Email";
 
             [Bindable] public var messagingPopupTitle:String = _defaultMessagingPopupTitle;
             [Bindable] public var messagingPopupMessage:String = _defaultMessagingPopupMessage;
@@ -104,6 +104,14 @@
                     messagingPopupTitle = "Account Creation " + _defaultMessagingPopupTitle;
                     messagingPopupMessage = "Account creation " + _defaultMessagingPopupMessage;
                     _formValidatedSuccessfully = true;
+
+                    //add the user to the DB
+                    var user:User = new User();
+                    user.username = username;
+                    user.email = email;
+                    user.password = password;
+                    user.gender = genderRBGroup.selectedValue.toString();
+                    _appModel.addUserToCollection(user);
                 }
                 return _formValidatedSuccessfully;
             }
