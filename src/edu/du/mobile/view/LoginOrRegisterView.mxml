@@ -5,23 +5,32 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
     xmlns:s="library://ns.adobe.com/flex/spark"
     xmlns:popups="edu.du.mobile.view.popups.*"
+    xmlns:mx="library://ns.adobe.com/flex/mx"
     currentState="register">
 
     <fx:Script>
         <![CDATA[
         import edu.du.mobile.control.events.NavigationEvent;
         import edu.du.mobile.model.constants.ApplicationScreens;
+        import edu.du.mobile.model.vo.User;
+        import edu.du.mobile.model.AppModel;
 
-            import mx.managers.PopUpManager;
+        import mx.events.ValidationResultEvent;
 
-            public static const VIEW_STATE_LOGIN:String = "login";
+        import mx.managers.PopUpManager;
+        import mx.validators.ValidationResult;
+
+        public static const VIEW_STATE_LOGIN:String = "login";
             public static const VIEW_STATE_REGISTER:String = "register";
 
             private const _defaultMessagingPopupTitle:String = "Success";
             private const _defaultMessagingPopupMessage:String = "successful";
 
+            private const _invalidEmailMessage:String = "Invalid Email";
+
             [Bindable] public var messagingPopupTitle:String = _defaultMessagingPopupTitle;
             [Bindable] public var messagingPopupMessage:String = _defaultMessagingPopupMessage;
+            [Bindable] private var _appModel:AppModel = AppModel.getInstance();
 
             private var _formValidatedSuccessfully:Boolean;
 
@@ -37,18 +46,30 @@
                     messagingPopupMessage = "Please fill out username/email and password.";
                     _formValidatedSuccessfully = false;
                 }
-                // TODO: Change this else if to loop through the AppModel's userCollection to compare the username and password against users in the collection.
-                else if( username.toLowerCase() != "student" || password != "password" )
-                {
-                    messagingPopupTitle = "Login Error";
-                    messagingPopupMessage = "Invalid user/password combination.";
-                    _formValidatedSuccessfully = false;
-                }
+                // TODO: Change this else if to loop through the AppModel's userCollection to compare the username and password against users in the collection. - Done
                 else
                 {
-                    messagingPopupTitle = "Login " + _defaultMessagingPopupTitle;
-                    messagingPopupMessage = "Login " + _defaultMessagingPopupMessage;
-                    _formValidatedSuccessfully = true;
+
+                    var userTotal:int = _appModel.userCollection.length;
+
+                    for (var i:int = 0; i < userTotal; i++ )
+                    {
+                        if((_appModel.userCollection[i].username).toLowerCase() == username.toLowerCase())
+                        {
+                            if(_appModel.userCollection[i].password == password)
+                            {
+                                messagingPopupTitle = "Login " + _defaultMessagingPopupTitle;
+                                messagingPopupMessage = "Login " + _defaultMessagingPopupMessage;
+                                _formValidatedSuccessfully = true;
+                                return _formValidatedSuccessfully;
+                            }
+                        }
+                    }
+
+                    //no matches found message
+                    messagingPopupTitle = "Login Failure";
+                    messagingPopupMessage = "Invalid Username or Password ";
+                    _formValidatedSuccessfully = false;
                 }
                 return _formValidatedSuccessfully;
             }
@@ -60,6 +81,7 @@
                 var password:String = password_ti.text;
                 var confirmPassword:String = confirm_password_ti.text;
                 var agreeToTerms:Boolean = agreeToTerms_chk.selected;
+                var emailValResult:ValidationResultEvent = email_val.validate();
 
                 if( username == ""
                     || email == ""
@@ -71,11 +93,25 @@
                     messagingPopupMessage = "Please fill out all required (*) fields.";
                     _formValidatedSuccessfully = false;
                 }
+                else if (emailValResult.type !== ValidationResultEvent.VALID)
+                {
+                    messagingPopupTitle = "Invalid Email";
+                    messagingPopupMessage = "Invalid Email Address";
+                    _formValidatedSuccessfully = false;
+                }
                 else
                 {
                     messagingPopupTitle = "Account Creation " + _defaultMessagingPopupTitle;
                     messagingPopupMessage = "Account creation " + _defaultMessagingPopupMessage;
                     _formValidatedSuccessfully = true;
+
+                    //add the user to the DB
+                    var user:User = new User();
+                    user.username = username;
+                    user.email = email;
+                    user.password = password;
+                    user.gender = genderRBGroup.selectedValue.toString();
+                    _appModel.addUserToCollection(user);
                 }
                 return _formValidatedSuccessfully;
             }
@@ -129,7 +165,12 @@
             message="{ messagingPopupMessage }"
             close="_onMessagingPopupClose( event )"/>
 
-        <!-- TODO: Add an EmailValidator and use it to validate the email field when the user registers: https://flex.apache.org/asdoc/mx/validators/EmailValidator.html -->
+        <!-- TODO: Add an EmailValidator and use it to validate the email field when the user registers: https://flex.apache.org/asdoc/mx/validators/EmailValidator.html - Done -->
+        <mx:EmailValidator id="email_val"
+                      source="{reg_email_ti}"
+                      triggerEvent="click"
+                      property="text"
+                      />
     </fx:Declarations>
 
 
@@ -203,6 +244,7 @@
                 <s:CheckBox id="agreeToTerms_chk"/>
                 <s:Label text="agree to terms *"/>
             </s:HGroup>
+
 
             <s:Button id="submit_btn"
                       label="submit"

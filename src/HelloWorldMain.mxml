@@ -14,12 +14,14 @@
         import edu.du.mobile.control.events.NavigationEvent;
         import edu.du.mobile.model.AppModel;
         import edu.du.mobile.model.constants.ApplicationScreens;
+        import edu.du.mobile.model.vo.User;
         import edu.du.mobile.model.vo.Venue;
         import edu.du.mobile.view.LocationDetailsView;
         import edu.du.mobile.view.LocationFeedListView;
         import edu.du.mobile.view.LoginOrRegisterView;
 
         import mx.collections.ArrayCollection;
+        import mx.core.UIComponent;
 
         import mx.events.FlexEvent;
         import mx.rpc.Fault;
@@ -61,8 +63,11 @@
             dispatchEvent(new NavigationEvent(NavigationEvent.GOTO_SCREEN, ApplicationScreens.LOGIN));
 
 
-            // TODO: Only make this HTTPService call if the _appModel.userCollection has no users in it.
-            dummyUserService.send();
+            // TODO: Only make this HTTPService call if the _appModel.userCollection has no users in it. - Done
+            if(_appModel.userCollection.length == 0)
+            {
+               dummyUserService.send();
+            }
         }
 
         private function _onGotoScreen(event:NavigationEvent):void {
@@ -103,7 +108,7 @@
             var venuesCollection:ArrayCollection = _appModel.venuesCollection;
             var venueData:Object = JSON.parse(event.result.toString());
 
-            for each( var venueData:Object in venueData.response.venues )
+            for each(venueData in venueData.response.venues )
             {
                 trace( venueData.name );
                 var venue:Venue = new Venue();
@@ -119,7 +124,23 @@
         private function _onDummyUserServiceResult(event:ResultEvent):void {
             trace("Dummy User Returned");
 
-            // TODO: Parse the data from the event.result into a User. Add the user to the AppModel userCollection via AppModel's addUserToCollection()
+            // TODO: Parse the data from the event.result into a User. Add the user to the AppModel userCollection via AppModel's addUserToCollection() - Done
+           var users:XML = event.result as XML;
+           _appModel = AppModel.getInstance();
+
+
+            var user:User = new User();
+            user.username = users.username;
+            user.email = users.email;
+            user.gender = users.gender;
+            user.password = users.password;
+
+
+
+            _appModel.addUserToCollection(user);
+
+
+
         }
 
         private function _onServiceFault(event:FaultEvent):void {
